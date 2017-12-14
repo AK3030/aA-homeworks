@@ -6,7 +6,7 @@ class Board
     @name2 = name2
     @cups = Array.new(14) {Array.new(4) {:stone}}
     @opponentcup = {name1=> 13, name2 => 6}
-    # @playercup = {name2=>13,name1=>6}
+    @playercup = {name2=>13,name1=>6}
     @cups[6] = []
     @cups[13] = []
   end
@@ -56,10 +56,9 @@ class Board
 
   def next_turn(ending_cup_idx, current_player_name)
     # helper method to determine what #make_move returns
-    p
-    return :prompt if ending_cup_idx == @cups[ending_cup_idx]
+    return :prompt if ending_cup_idx == @playercup[current_player_name]
     return :switch if @cups[ending_cup_idx].length == 1
-
+    return ending_cup_idx
   end
 
   def render
@@ -71,9 +70,23 @@ class Board
   end
 
   def one_side_empty?
+    side1_empty = (0..5).all? {|el| @cups[el].empty?}
+    side2_empty = (7..12).all? {|el| @cups[el].empty?}
+    return side1_empty || side2_empty
   end
 
   def winner
+
+    name1_total = @cups[@playercup[@name1]].length
+    name2_total = @cups[@playercup[@name2]].length
+    if name1_total > name2_total
+      return @name1
+    elsif name2_total > name2_total
+      return @name2
+    else
+      return :draw
+    end
+
   end
 end
 
