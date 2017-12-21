@@ -1,0 +1,2 @@
+class PeopleTable < ApplicationRecord
+end
