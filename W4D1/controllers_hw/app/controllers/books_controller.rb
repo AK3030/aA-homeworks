@@ -9,7 +9,8 @@ class BooksController < ApplicationController
   end
 
   def create
-    # your code here
+    Book.create(title: params[:book][:title],author: params[:book][:author])
+    redirect_to action: 'index'
   end
 
   def destroy
