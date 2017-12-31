@@ -102,33 +102,39 @@ class CorgiSnacks
 
 end
 
-
 class MetaCorgiSnacks
   def initialize(snack_box, box_id)
     @snack_box = snack_box
     @box_id = box_id
+    snack_box.methods.grep(/^get_(.*)_info$/) { MetaCorgiSnacks.define_snack $1 }
   end
-
-  # def method_missing(name, *args)
-  #   tastiness = "get_" + name.to_s + "_tastiness"
-  #   @snack_box.send(tastiness, @box_id)
-  #   # @snack_box.get_bone_info(@box_id)
-  # end
-
-
-  def self.define_snack(name)
-    tastiness = "get_" + name + "_tastiness"
-
-
-  end
-
-  define_snack(:treat)
-  define_snack(:kibble)
-  define_snack(:bone)
 end
 
-# thing = MetaCorgiSnacks.new(SnackBox.new, 1)
-# p thing.bone
-MetaCorgiSnacks.define_snack
-a = MetaCorgiSnacks(x, y)
-a.define_snack("kibble")
+  phase 1
+  def method_missing(name, *args)
+    info = @snack_box.send("get_#{name}_info", @box_id)
+    tastiness = @snack_box.send("get_#{name}_tastiness", @box_id)
+    name = "#{name.to_s.split('_').map(&:capitalize).join(' ')}"
+    result = "#{name}: #{info}: #{tastiness} "
+    tastiness > 30 ? "* #{result}" : result
+  end
+
+  # phase 2
+  def self.define_snack(name)
+    # p self
+    # p @snack_box
+    define_method(name) do
+      p @snack_box
+      info = @snack_box.send("get_#{name}_info", @box_id)
+      tastiness = @snack_box.send("get_#{name}_tastiness", @box_id)
+      display_name = "#{name.split('_').map(&:capitalize).join(' ')}"
+      result = "#{display_name}: #{info}: #{tastiness}"
+      tastiness > 30 ? "* #{result}" : result
+    end
+  end
+end
+
+
+thing = MetaCorgiSnacks.new(SnackBox.new, 1)
+thing.treat
+# thing.define_snack(:treat)
